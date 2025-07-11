@@ -66,39 +66,42 @@ const Approvals = () => {
       }
     }
   }, [testInstances]);
+  const handleSearch = (e) => {
+    setSearchBar(e.target.value)
+    const searchTerm = e.target.value.toLowerCase();
+    const filtered = vehicless.filter(
+      (v) =>
+        v.bookingId.toLowerCase().includes(searchTerm) ||
+        v.regnNo.toLowerCase().includes(searchTerm)
+    );
+    setVehicles(filtered);
+  };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+
+   
+
     const payload = {
-      bookingId: selectedVehicle.bookingId,
+      bookingId: selectedVehicle?.bookingId,
       certificateType,
       certificateStatus,
       validFrom: validFrom || null,
       validTo: validTo || null,
       adminComments: adminComments || "",
       issuedAt: new Date().toISOString(),
-      
-      
-    };
-
-    console.log('Sending payload:', payload);
-
+    }; console.log('Sending payload:', payload);
+    
+    // Use axios correctly
     try {
-      const response = await axiosInstance.post('/nic/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        alert('Certificate issued successfully!');
-      } else {
-        console.error('Failed to issue certificate');
-      }
+      const { data } = await axiosInstance.post('/nic/send', payload);
+      alert('Certificate issued successfully!');
     } catch (err) {
-      console.error('Error:', err);
+      console.error('Error:', err?.response?.data || err.message);
     }
+    
   };
 
   return (
@@ -113,7 +116,7 @@ const Approvals = () => {
                 type="text"
                 placeholder="Enter Vehicle..."
                 value={searchBar}
-                onChange={(e) => setSearchBar(e.target.value)}
+                onChange={handleSearch}
                 className="flex-1 outline-none"
               />
             </div>

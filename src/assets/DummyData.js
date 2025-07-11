@@ -1,0 +1,456 @@
+const pendingApprovals = [
+  {
+    BookingId: 5003,
+    status: "Pending Approval",
+    VechicleId: "VH-2025-0741",
+    VechicleType: "Passenger Bus",
+    RegistrationNumber: "KA-01-AB-1234",
+    TechnicianName: "John Doe",
+    TestDate: "2025-01-15",
+    Owner: "John Doe",
+   Tests: {
+    rule189_1a: { item: "Service Brake Performance", type: "Automated", status: "Passed" },
+    rule189_1b: { item: "Parking Brake Performance", type: "Automated", status: "Passed" },
+    rule189_2: { item: "Headlight Beam Alignment", type: "Automated", status: "Passed" },
+    rule189_3a: { item: "Side Slip Test - Left", type: "Automated", status: "Passed" },
+    rule189_3b: { item: "Side Slip Test - Right", type: "Automated", status: "Passed" },
+    rule189_3c: { item: "Suspension Test - Front Left", type: "Automated", status: "Passed" },
+    rule189_3d: { item: "Suspension Test - Front Right", type: "Automated", status: "Passed" },
+    rule189_3e: { item: "Suspension Test - Rear Left", type: "Automated", status: "Passed" },
+    rule189_3f: { item: "Suspension Test - Rear Right", type: "Automated", status: "Passed" },
+    rule189_3g: { item: "Wheel Alignment Check", type: "Automated", status: "Passed" },
+    rule189_3h: { item: "Wheel Balance Check", type: "Automated", status: "Passed" },
+    rule189_3i: { item: "Tyre Condition Check", type: "Visual", status: "Passed" },
+    rule189_4: { item: "Speedometer Calibration", type: "Automated", status: "Passed" },
+    rule189_5: { item: "Sound Level Test", type: "Automated", status: "Passed" },
+    rule189_6: { item: "Emission Test - Opacity / Gas Analyzer", type: "Automated", status: "Passed" },
+    rule189_7: { item: "Exhaust Leak Test", type: "Automated", status: "Passed" },
+    rule189_7_Visual: { item: "Exhaust System Check", type: "Visual", status: "Passed" },
+    rule189_8a: { item: "Underbody Inspection - Structural Integrity", type: "Visual", status: "Passed" },
+    rule189_8b: { item: "Underbody Inspection - Rust / Damage", type: "Visual", status: "Passed" },
+    // ... all remaining entries with status: "Passed"
+    // Example:
+    imgChassis: { item: "Photo: Chassis", type: "Visual Proof", status: "Passed" }
+  },
+  },
+  {
+    BookingId: 5004,
+    status: "Pending Approval",
+    VechicleId: "VH-2025-0742",
+    VechicleType: "Cargo Truck",
+    RegistrationNumber: "KA-01-CD-5678",
+    TechnicianName: "Jane Smith",
+    TestDate: "2025-01-16",
+    Owner: "Vamsi",
+    
+  },
+  {
+    BookingId: 5005,
+    status: "Pending Approval",
+    VechicleId: "VH-2025-0743",
+    VechicleType: "Passenger Car",
+    RegistrationNumber: "KA-01-EF-9101",
+    TechnicianName: "Alice Johnson",
+    TestDate: "2025-01-17",
+    Owner: "Kevin",
+    Tests: {
+      rule189_1a: { item: "Service Brake Performance", type: "Automated", status: "Passed" },
+      rule189_1b: { item: "Parking Brake Performance", type: "Automated", status: "Passed" },
+      rule189_2: { item: "Headlight Beam Alignment", type: "Automated", status: "Passed" },
+      rule189_3a: { item: "Side Slip Test - Left", type: "Automated", status: "Passed" },
+      rule189_3b: { item: "Side Slip Test - Right", type: "Automated", status: "Failed" },
+      rule189_3c: { item: "Suspension Test - Front Left", type: "Automated", status: "Passed" },
+      rule189_3d: { item: "Suspension Test - Front Right", type: "Automated", status: "Passed" },
+      rule189_3e: { item: "Suspension Test - Rear Left", type: "Automated", status: "Passed" },
+      rule189_3f: { item: "Suspension Test - Rear Right", type: "Automated", status: "Passed" },
+      rule189_3g: { item: "Wheel Alignment Check", type: "Automated", status: "Passed" },
+      rule189_3h: { item: "Wheel Balance Check", type: "Automated", status: "Passed" },
+      rule189_3i: { item: "Tyre Condition Check", type: "Visual", status: "Passed" },
+      rule189_4: { item: "Speedometer Calibration", type: "Automated", status: "Passed" },
+      rule189_5: { item: "Sound Level Test", type: "Automated", status: "Passed" },
+      rule189_6: { item: "Emission Test - Opacity / Gas Analyzer", type: "Automated", status: "Passed" },
+      rule189_7: { item: "Exhaust Leak Test", type: "Automated", status: "Passed" },
+      rule189_7_Visual: { item: "Exhaust System Check", type: "Visual", status: "Passed" },
+      rule189_8a: { item: "Underbody Inspection - Structural Integrity", type: "Visual", status: "Passed" },
+      rule189_8b: { item: "Underbody Inspection - Rust / Damage", type: "Visual", status: "Passed" },
+      // ... all remaining entries with status: "Passed"
+      // Example:
+      imgChassis: { item: "Photo: Chassis", type: "Visual Proof", status: "Passed" }
+    },
+  },
+  {
+    BookingId: 5006,
+    status: "Pending Approval",
+    VechicleId: "VH-2025-0744",
+    VechicleType: "Motorcycle",
+    RegistrationNumber: "KA-01-GH-1121",
+    TechnicianName: "Bob Brown",
+    TestDate: "2025-01-18",
+    Owner: "Kiran",
+    Tests: {
+      rule189_1a: { item: "Service Brake Performance", type: "Automated", status: "Passed" },
+      rule189_1b: { item: "Parking Brake Performance", type: "Automated", status: "Passed" },
+      rule189_2: { item: "Headlight Beam Alignment", type: "Automated", status: "Passed" },
+      rule189_3a: { item: "Side Slip Test - Left", type: "Automated", status: "Passed" },
+      rule189_3b: { item: "Side Slip Test - Right", type: "Automated", status: "Passed" },
+      rule189_3c: { item: "Suspension Test - Front Left", type: "Automated", status: "Passed" },
+      rule189_3d: { item: "Suspension Test - Front Right", type: "Automated", status: "Passed" },
+      rule189_3e: { item: "Suspension Test - Rear Left", type: "Automated", status: "Passed" },
+      rule189_3f: { item: "Suspension Test - Rear Right", type: "Automated", status: "Passed" },
+      rule189_3g: { item: "Wheel Alignment Check", type: "Automated", status: "Passed" },
+      rule189_3h: { item: "Wheel Balance Check", type: "Automated", status: "Passed" },
+      rule189_3i: { item: "Tyre Condition Check", type: "Visual", status: "Passed" },
+      rule189_4: { item: "Speedometer Calibration", type: "Automated", status: "Passed" },
+      rule189_5: { item: "Sound Level Test", type: "Automated", status: "Passed" },
+      rule189_6: { item: "Emission Test - Opacity / Gas Analyzer", type: "Automated", status: "Passed" },
+      rule189_7: { item: "Exhaust Leak Test", type: "Automated", status: "Passed" },
+      rule189_7_Visual: { item: "Exhaust System Check", type: "Visual", status: "Passed" },
+      rule189_8a: { item: "Underbody Inspection - Structural Integrity", type: "Visual", status: "Passed" },
+      rule189_8b: { item: "Underbody Inspection - Rust / Damage", type: "Visual", status: "Passed" },
+      // ... all remaining entries with status: "Passed"
+      // Example:
+      imgChassis: { item: "Photo: Chassis", type: "Visual Proof", status: "Passed" }
+    },
+  },
+  {
+    BookingId: 5007,
+    status: "Pending Approval",
+    VechicleId: "VH-2025-0745",
+    VechicleType: "Electric Scooter",
+    RegistrationNumber: "KA-01-IJ-3141",
+    TechnicianName: "Charlie Davis",
+    TestDate: "2025-01-19",
+    Owner: "Helo",
+    Tests: {
+      rule189_1a: { item: "Service Brake Performance", type: "Automated", status: "Passed" },
+      rule189_1b: { item: "Parking Brake Performance", type: "Automated", status: "Passed" },
+      rule189_2: { item: "Headlight Beam Alignment", type: "Automated", status: "Passed" },
+      rule189_3a: { item: "Side Slip Test - Left", type: "Automated", status: "Passed" },
+      rule189_3b: { item: "Side Slip Test - Right", type: "Automated", status: "Passed" },
+      rule189_3c: { item: "Suspension Test - Front Left", type: "Automated", status: "Passed" },
+      rule189_3d: { item: "Suspension Test - Front Right", type: "Automated", status: "Passed" },
+      rule189_3e: { item: "Suspension Test - Rear Left", type: "Automated", status: "Passed" },
+      rule189_3f: { item: "Suspension Test - Rear Right", type: "Automated", status: "Passed" },
+      rule189_3g: { item: "Wheel Alignment Check", type: "Automated", status: "Passed" },
+      rule189_3h: { item: "Wheel Balance Check", type: "Automated", status: "Passed" },
+      rule189_3i: { item: "Tyre Condition Check", type: "Visual", status: "Passed" },
+      rule189_4: { item: "Speedometer Calibration", type: "Automated", status: "Passed" },
+      rule189_5: { item: "Sound Level Test", type: "Automated", status: "Passed" },
+      rule189_6: { item: "Emission Test - Opacity / Gas Analyzer", type: "Automated", status: "Passed" },
+      rule189_7: { item: "Exhaust Leak Test", type: "Automated", status: "Passed" },
+      rule189_7_Visual: { item: "Exhaust System Check", type: "Visual", status: "Passed" },
+      rule189_8a: { item: "Underbody Inspection - Structural Integrity", type: "Visual", status: "Passed" },
+      rule189_8b: { item: "Underbody Inspection - Rust / Damage", type: "Visual", status: "Passed" },
+      // ... all remaining entries with status: "Passed"
+      // Example:
+      imgChassis: { item: "Photo: Chassis", type: "Visual Proof", status: "Passed" }
+    },
+  },
+];
+
+const temp = [
+  {
+    RegistrationNumber: "KA-01-AB-1234",
+    Owner: "John Doe",
+    TestDate: "2025-01-15",
+    VechicleType: "Passenger Bus",
+    Status: "Pending Approval",
+    BookingId: 5003,
+    testData: [
+      {
+        TestId: 1,
+        TestName: "Brake Test",
+        Result: "Passed",
+      },
+      {
+        TestId: 2,
+        TestName: "Emission Test",
+        Result: "Passed",
+      },
+      {
+        TestId: 3,
+        TestName: "Safety Inspection",
+        Result: "Passed",
+      },
+      {
+        TestId: 4,
+        TestName: "Tire Condition",
+        Result: "Passed",
+      },
+      {
+        TestId: 5,
+        TestName: "Light Functionality",
+        Result: "Passed",
+      },
+      {
+        TestId: 6,
+        TestName: "Fluid Levels",
+        Result: "Passed",
+      },
+      {
+        TestId: 7,
+        TestName: "Steering Response",
+        Result: "Passed",
+      },
+      {
+        TestId: 8,
+        TestName: "Suspension Check",
+        Result: "Passed",
+      },
+    ],
+  },
+  {
+    RegistrationNumber: "KA-01-CD-5678",
+    Owner: "Jane Smith",
+    TestDate: "2025-01-16",
+    VechicleType: "Cargo Truck",
+    Status: "Pending Approval",
+    BookingId: 5004,
+    testData: [
+      {
+        TestId: 1,
+        TestName: "Brake Test",
+        Result: "Passed",
+      },
+      {
+        TestId: 2,
+        TestName: "Emission Test",
+        Result: "Passed",
+      },
+      {
+        TestId: 3,
+        TestName: "Safety Inspection",
+        Result: "Passed",
+      },
+      {
+        TestId: 4,
+        TestName: "Tire Condition",
+        Result: "Passed",
+      },
+      {
+        TestId: 5,
+        TestName: "Light Functionality",
+        Result: "Passed",
+      },
+      {
+        TestId: 6,
+        TestName: "Fluid Levels",
+        Result: "Passed",
+      },
+      {
+        TestId: 7,
+        TestName: "Steering Response",
+        Result: "Passed",
+      },
+      {
+        TestId: 8,
+        TestName: "Suspension Check",
+        Result: "Passed",
+      },
+    ],
+  },
+  {
+    RegistrationNumber: "KA-01-EF-9101",
+    Owner: "Alice Johnson",
+    TestDate: "2025-01-17",
+    VechicleType: "Passenger Car",
+    Status: "Pending Approval",
+    BookingId: 5005,
+    testData: [
+      {
+        TestId: 1,
+        TestName: "Brake Test",
+        Result: "Passed",
+      },
+      {
+        TestId: 2,
+        TestName: "Emission Test",
+        Result: "Passed",
+      },
+      {
+        TestId: 3,
+        TestName: "Safety Inspection",
+        Result: "Passed",
+      },
+      {
+        TestId: 4,
+        TestName: "Tire Condition",
+        Result: "Passed",
+      },
+      {
+        TestId: 5,
+        TestName: "Light Functionality",
+        Result: "Passed",
+      },
+      {
+        TestId: 6,
+        TestName: "Fluid Levels",
+        Result: "Passed",
+      },
+      {
+        TestId: 7,
+        TestName: "Steering Response",
+        Result: "Passed",
+      },
+      {
+        TestId: 8,
+        TestName: "Suspension Check",
+        Result: "Passed",
+      },
+    ],
+  },
+  {
+    RegistrationNumber: "KA-01-GH-1121",
+    Owner: "Bob Brown",
+    TestDate: "2025-01-18",
+    VechicleType: "Motorcycle",
+    Status: "Pending Approval",
+    BookingId: 5006,
+    testData: [
+      {
+        TestId: 1,
+        TestName: "Brake Test",
+        Result: "Passed",
+      },
+      {
+        TestId: 2,
+        TestName: "Emission Test",
+        Result: "Passed",
+      },
+      {
+        TestId: 3,
+        TestName: "Safety Inspection",
+        Result: "Passed",
+      },
+      {
+        TestId: 4,
+        TestName: "Tire Condition",
+        Result: "Passed",
+      },
+      {
+        TestId: 5,
+        TestName: "Light Functionality",
+        Result: "Passed",
+      },
+      {
+        TestId: 6,
+        TestName: "Fluid Levels",
+        Result: "Passed",
+      },
+      {
+        TestId: 7,
+        TestName: "Steering Response",
+        Result: "Passed",
+      },
+      {
+        TestId: 8,
+        TestName: "Suspension Check",
+        Result: "Passed",
+      },
+    ],
+  },
+  {
+    RegistrationNumber: "KA-01-IJ-3141",
+    Owner: "Charlie Davis",
+    TestDate: "2025-01-19",
+    VechicleType: "Electric Scooter",
+    Status: "Pending Approval",
+    BookingId: 5007,
+    testData: [
+      {
+        TestId: 1,
+        TestName: "Brake Test",
+        Result: "Passed",
+      },
+      {
+        TestId: 2,
+        TestName: "Emission Test",
+        Result: "Passed",
+      },
+      {
+        TestId: 3,
+        TestName: "Safety Inspection",
+        Result: "Passed",
+      },
+      {
+        TestId: 4,
+        TestName: "Tire Condition",
+        Result: "Passed",
+      },
+      {
+        TestId: 5,
+        TestName: "Light Functionality",
+        Result: "Passed",
+      },
+      {
+        TestId: 6,
+        TestName: "Fluid Levels",
+        Result: "Passed",
+      },
+    ],
+  },
+];
+
+const vehicleData = [
+  {
+    id: "VH-2025-0742",
+    type: "Commercial Truck",
+    registration: "MH-04-AB-1234",
+    owner: "Reliance Transport Ltd.",
+    lastTest: "-",
+    status: "Pending",
+  },
+  {
+    id: "VH-2025-0741",
+    type: "Passenger Bus",
+    registration: "KA-01-CD-5678",
+    owner: "Karnataka State Transport",
+    lastTest: "July 1, 2025",
+    status: "Completed",
+  },
+  {
+    id: "VH-2025-0740",
+    type: "Heavy Truck",
+    registration: "DL-01-EF-9012",
+    owner: "Northern Logistics Co.",
+    lastTest: "June 28, 2025",
+    status: "Failed",
+  },
+  {
+    id: "VH-2025-0739",
+    type: "School Bus",
+    registration: "TN-05-GH-3456",
+    owner: "St. Mary's School",
+    lastTest: "In Progress",
+    status: "In Progress",
+  },
+  {
+    id: "VH-2025-0738",
+    type: "Delivery Van",
+    registration: "GJ-06-IJ-7890",
+    owner: "QuickShip Couriers",
+    lastTest: "June 25, 2025",
+    status: "Approved",
+  },
+  {
+    id: "VH-2025-0737",
+    type: "Tanker Truck",
+    registration: "MP-07-KL-1234",
+    owner: "Central Petroleum Ltd.",
+    lastTest: "June 22, 2025",
+    status: "Approved",
+  },
+  // Add more dummy records for testing pagination
+  ...Array.from({ length: 36 }, (_, i) => ({
+    id: `VH-2025-07${i + 43}`,
+    type: "Type " + (i + 1),
+    registration: `XX-00-XX-${1000 + i}`,
+    owner: `Owner ${i + 1}`,
+    lastTest: "July 1, 2025",
+    status: ["Pending", "Completed", "Failed", "Approved", "In Progress"][
+      i % 5
+    ],
+  })),
+];
+
+export { pendingApprovals, vehicleData };
