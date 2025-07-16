@@ -4,6 +4,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { useVehicleStore } from "../store/useVehicleStore";
 import AddVehicleModal from "../components/AddVehicleModal";
 import dayjs from "dayjs";
+import axiosInstance from "../services/axiosInstance";
 
 const statusColor = {
   PENDING: "bg-yellow-100 text-yellow-700",
@@ -36,6 +37,7 @@ const Vehicles = () => {
     setCurrentPage(1);
   }, [searchTerm, vehicles]);
 
+
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const pageStartIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const visibleData = filtered.slice(
@@ -43,6 +45,11 @@ const Vehicles = () => {
     pageStartIndex + ITEMS_PER_PAGE
   );
 
+  const handleClick=async(bookingId)=>{
+     const res=await axiosInstance.post("/tests/start",{bookingId:bookingId})
+     
+    console.log(res)
+  }
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 3;
@@ -51,7 +58,10 @@ const Vehicles = () => {
     for (let i = startPage; i <= endPage; i++) pages.push(i);
     return pages;
   };
-
+ 
+ 
+ 
+  
   return (
     <div className="p-6 bg-white rounded-xl shadow-md border border-gray-200">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
@@ -113,6 +123,7 @@ const Vehicles = () => {
                     <FileText className="h-4 w-4 cursor-pointer hover:text-gray-700" />
                     <Eye className="h-4 w-4 cursor-pointer hover:text-gray-700" />
                     <Edit className="h-4 w-4 cursor-pointer hover:text-gray-700" />
+                    <button onClick={()=>handleClick(vehicle.bookingId)}>Start</button>
                     {vehicle.status === "IN_PROGRESS" && (
                       <Play className="h-4 w-4 text-blue-500 cursor-pointer hover:text-blue-700" />
                     )}

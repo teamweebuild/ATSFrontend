@@ -1,11 +1,33 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAuthStore } from "../store/useAuthStore.js";
+import { useVehicleStore } from "../store/useVehicleStore.js";
+
+import MetricCard from "../components/MetricCard";
+
+import done from "../assets/Vector-4.svg";
+import car from "../assets/car.svg";
+import clock from "../assets/Group.svg";
 
 const Dashboard = () => {
   const { user } = useAuthStore();
 
+
+
+  const totalvehicles=useVehicleStore(state=>state.fetchTodayVehicles)
+  const vehicles = useVehicleStore((state) => state.vehicles || []);
+  const submittedVehiclesFn=useVehicleStore((state)=>state.submittedVehicles);
+  const submittedVehicles=useVehicleStore((state)=>state.reportVehicles);
+  
+  useEffect(()=>{
+    submittedVehiclesFn();
+    totalvehicles();
+ },[submittedVehiclesFn,totalvehicles])
+
+
+  const getCount = (arr) => arr?.length || 0;
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h1 className="text-3xl font-bold text-blue-700">Dashboard</h1>
 
       {user ? (
@@ -16,6 +38,27 @@ const Dashboard = () => {
       ) : (
         <p className="text-red-500">Loading user...</p>
       )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <MetricCard
+          title="Total Tests"
+          value={getCount(vehicles)}
+          icon={car}
+          color="blue"
+        />
+        <MetricCard
+          title="Tests Completed"
+          value={getCount(submittedVehicles)}
+          icon={done}
+          color="green"
+        />
+        <MetricCard
+          title="Pending Tests"
+          value={getCount(vehicles)-getCount(submittedVehicles)}
+          icon={clock}
+          color="yellow"
+        />
+      </div>
     </div>
   );
 };
