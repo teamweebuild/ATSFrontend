@@ -12,6 +12,7 @@ import Users from "./pages/Users";
 import Settings from "./pages/Settings";5174
 
 import Layout from "./components/Layout";
+import VisualTestPage from "./pages/VisualTestPage";
 
 const App = () => {
  const { token, user, fetchUser } = useAuthStore();
@@ -35,6 +36,8 @@ const App = () => {
             <Route path="/vehicles" element={<Vehicles />} />
             <Route path="/tests" element={<Tests />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/visualtest" element={<VisualTestPage />} />
+
 
             {/* Admin-only */}
             {user?.role === "ATS_ADMIN" && (
