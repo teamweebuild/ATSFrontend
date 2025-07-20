@@ -47,7 +47,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         md:translate-x-0 md:static md:shadow-none`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between px-5 py-5 border-b shadow border-gray-200">
           <div className="flex items-center space-x-2">
             <div className="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm">ATS</div>
             <span className="text-lg font-semibold text-blue-800">ATS System</span>
