@@ -9,10 +9,11 @@ import Tests from "./pages/Tests";
 import Reports from "./pages/Reports";
 import Approvals from "./pages/Approvals";
 import Users from "./pages/Users";
-import Settings from "./pages/Settings";5174
+import Settings from "./pages/Settings";
 
 import Layout from "./components/Layout";
 import VisualTestPage from "./pages/VisualTestPage";
+import FunctionalTestPage from "./pages/FunctionalTestPage";
 
 const App = () => {
  const { token, user, fetchUser } = useAuthStore();
@@ -37,6 +38,7 @@ const App = () => {
             <Route path="/tests" element={<Tests />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/visualtest" element={<VisualTestPage />} />
+            <Route path="/functionaltest" element={<FunctionalTestPage />} />
 
 
             {/* Admin-only */}

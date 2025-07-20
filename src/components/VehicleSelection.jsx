@@ -16,13 +16,14 @@ const VehicleSelection = ({
   totalPages,
   onPageChange,
   startIndex,
-  endIndex
+  endIndex,
+  title = "Select Vehicle for Visual Test" // Default title
 }) => {
   return (
     <div className="mb-8">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-700">
-          Select Vehicle for Visual Test
+          {title}
         </h3>
         <button
           onClick={onRefresh}

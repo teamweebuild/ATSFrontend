@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serial Data Simulator Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .start-btn {
+            background: #22c55e;
+            color: white;
+        }
+        .stop-btn {
+            background: #ef4444;
+            color: white;
+        }
+        .clear-btn {
+            background: #64748b;
+            color: white;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .status.running {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #22c55e;
+        }
+        .status.stopped {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        .data-display {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .data-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .timestamp {
+            color: #6b7280;
+            font-size: 10px;
+            margin-bottom: 5px;
+        }
+        .parsed-data {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .data-field {
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: 4px;
+            border-left: 3px solid #3b82f6;
+        }
+        .field-name {
+            font-weight: bold;
+            color: #1e40af;
+            font-size: 11px;
+        }
+        .field-value {
+            color: #1f2937;
+            font-size: 13px;
+        }
+        .acceleration-highlight {
+            border-left-color: #22c55e !important;
+            background: #f0fdf4 !important;
+        }
+        .acceleration-highlight .field-name {
+            color: #15803d !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Serial Data Simulator Test Page</h1>
+        <p>This page tests the serial data simulation for the functional test system.</p>
+        
+        <div class="controls">
+            <button class="start-btn" onclick="startTest()">▶️ Start Simulation</button>
+            <button class="stop-btn" onclick="stopTest()">⏹️ Stop Simulation</button>
+            <button class="clear-btn" onclick="clearDisplay()">🗑️ Clear Display</button>
+        </div>
+        
+        <div id="status" class="status stopped">
+            ⏸️ Simulation Stopped
+        </div>
+        
+        <div class="container">
+            <h3>📊 Live Serial Data</h3>
+            <div id="currentData" class="data-display">
+                <p style="color: #6b7280; text-align: center;">No data received yet. Start the simulation to see live data.</p>
+            </div>
+        </div>
+        
+        <div class="container">
+            <h3>📝 Data Log (Last 10 readings)</h3>
+            <div id="dataLog" class="data-display">
+                <p style="color: #6b7280; text-align: center;">Data log will appear here...</p>
+            </div>
+        </div>
+        
+        <div class="container">
+            <h3>📋 Statistics</h3>
+            <div id="stats">
+                <p>Total readings: <span id="totalReadings">0</span></p>
+                <p>Simulation time: <span id="simulationTime">0</span> seconds</p>
+                <p>Last acceleration reading: <span id="lastAcceleration">N/A</span></p>
+                <p>Average acceleration: <span id="avgAcceleration">N/A</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let dataLog = [];
+        let accelerationReadings = [];
+        let simulationStartTime = null;
+        let statsInterval = null;
+
+        // Override the serial data handler
+        window.onSerialData = function(data) {
+            console.log("📡 Received serial data:", data);
+            
+            // Parse the data
+            const parsedData = parseSerialData(data);
+            const timestamp = new Date();
+            
+            // Add to log
+            dataLog.unshift({
+                timestamp: timestamp,
+                raw: data,
+                parsed: parsedData
+            });
+            
+            // Keep only last 10 readings
+            if (dataLog.length > 10) {
+                dataLog = dataLog.slice(0, 10);
+            }
+            
+            // Track acceleration readings for stats
+            if (parsedData.acceleration_time) {
+                accelerationReadings.push(parseFloat(parsedData.acceleration_time));
+                if (accelerationReadings.length > 50) {
+                    accelerationReadings = accelerationReadings.slice(-50);
+                }
+            }
+            
+            updateDisplay();
+        };
+
+        function parseSerialData(dataString) {
+            const data = {};
+            const pairs = dataString.split(',');
+            
+            pairs.forEach(pair => {
+                const [key, value] = pair.split(':');
+                if (key && value !== undefined) {
+                    data[key.trim()] = value.trim();
+                }
+            });
+            
+            return data;
+        }
+
+        function updateDisplay() {
+            updateCurrentData();
+            updateDataLog();
+            updateStats();
+        }
+
+        function updateCurrentData() {
+            const currentDataDiv = document.getElementById('currentData');
+            
+            if (dataLog.length === 0) {
+                currentDataDiv.innerHTML = '<p style="color: #6b7280; text-align: center;">No data received yet.</p>';
+                return;
+            }
+            
+            const latest = dataLog[0];
+            const parsedHtml = Object.entries(latest.parsed).map(([key, value]) => {
+                const isAcceleration = key === 'acceleration_time';
+                return `
+                    <div class="data-field ${isAcceleration ? 'acceleration-highlight' : ''}">
+                        <div class="field-name">${key.replace(/_/g, ' ').toUpperCase()}</div>
+                        <div class="field-value">${value}${isAcceleration ? ' seconds' : ''}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            currentDataDiv.innerHTML = `
+                <div class="timestamp">Last updated: ${latest.timestamp.toLocaleTimeString()}</div>
+                <div class="parsed-data">${parsedHtml}</div>
+            `;
+        }
+
+        function updateDataLog() {
+            const dataLogDiv = document.getElementById('dataLog');
+            
+            if (dataLog.length === 0) {
+                dataLogDiv.innerHTML = '<p style="color: #6b7280; text-align: center;">Data log will appear here...</p>';
+                return;
+            }
+            
+            const logHtml = dataLog.map((item, index) => `
+                <div class="data-item">
+                    <div class="timestamp">#${dataLog.length - index} - ${item.timestamp.toLocaleTimeString()}</div>
+                    <div style="color: #374151; word-break: break-all;">${item.raw}</div>
+                </div>
+            `).join('');
+            
+            dataLogDiv.innerHTML = logHtml;
+        }
+
+        function updateStats() {
+            document.getElementById('totalReadings').textContent = dataLog.length;
+            
+            if (simulationStartTime) {
+                const elapsed = Math.floor((Date.now() - simulationStartTime) / 1000);
+                document.getElementById('simulationTime').textContent = elapsed;
+            }
+            
+            if (accelerationReadings.length > 0) {
+                const latest = accelerationReadings[accelerationReadings.length - 1];
+                const average = (accelerationReadings.reduce((a, b) => a + b, 0) / accelerationReadings.length).toFixed(2);
+                
+                document.getElementById('lastAcceleration').textContent = latest.toFixed(2) + ' seconds';
+                document.getElementById('avgAcceleration').textContent = average + ' seconds';
+            }
+        }
+
+        function startTest() {
+            if (window.startSerialSimulation) {
+                window.startSerialSimulation();
+                document.getElementById('status').className = 'status running';
+                document.getElementById('status').innerHTML = '▶️ Simulation Running';
+                simulationStartTime = Date.now();
+                
+                // Update stats every second
+                statsInterval = setInterval(updateStats, 1000);
+            } else {
+                alert('Serial simulator not loaded. Please refresh the page.');
+            }
+        }
+
+        function stopTest() {
+            if (window.stopSerialSimulation) {
+                window.stopSerialSimulation();
+                document.getElementById('status').className = 'status stopped';
+                document.getElementById('status').innerHTML = '⏸️ Simulation Stopped';
+                
+                if (statsInterval) {
+                    clearInterval(statsInterval);
+                    statsInterval = null;
+                }
+            }
+        }
+
+        function clearDisplay() {
+            dataLog = [];
+            accelerationReadings = [];
+            simulationStartTime = null;
+            document.getElementById('totalReadings').textContent = '0';
+            document.getElementById('simulationTime').textContent = '0';
+            document.getElementById('lastAcceleration').textContent = 'N/A';
+            document.getElementById('avgAcceleration').textContent = 'N/A';
+            updateDisplay();
+        }
+
+        // Load the simulator script
+        const script = document.createElement('script');
+        script.src = 'serial-data-simulator.js';
+        document.head.appendChild(script);
+        
+        // Auto-start after script loads
+        script.onload = function() {
+            console.log('✅ Serial simulator loaded');
+            setTimeout(() => {
+                console.log('🔄 Auto-starting simulation...');
+                startTest();
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
