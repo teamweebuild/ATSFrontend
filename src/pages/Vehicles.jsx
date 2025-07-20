@@ -5,6 +5,7 @@ import { useVehicleStore } from "../store/useVehicleStore";
 import AddVehicleModal from "../components/AddVehicleModal";
 import dayjs from "dayjs";
 import axiosInstance from "../services/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 const statusColor = {
   PENDING: "bg-yellow-100 text-yellow-700",
@@ -17,6 +18,7 @@ const statusColor = {
 const ITEMS_PER_PAGE = 7;
 
 const Vehicles = () => {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const vehicles = useVehicleStore((s) => s.vehicles);
   const fetchTodayVehicles = useVehicleStore((s) => s.fetchTodayVehicles);
@@ -24,10 +26,31 @@ const Vehicles = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD"));
+
+  // Fetch vehicles by date
+  const fetchVehiclesByDate = async (date) => {
+    try {
+      const formattedDate = dayjs(date).format("DDMMYYYY");
+      const res = await axiosInstance.get(`/vehicles/${formattedDate}`);
+      return res.data;
+    } catch (err) {
+      console.error("Error fetching vehicles by date:", err);
+      return [];
+    }
+  };
 
   useEffect(() => {
-    fetchTodayVehicles();
-  }, [fetchTodayVehicles]);
+    if (selectedDate === dayjs().format("YYYY-MM-DD")) {
+      // If selected date is today, use the existing function
+      fetchTodayVehicles();
+    } else {
+      // Fetch vehicles for the selected date
+      fetchVehiclesByDate(selectedDate).then((data) => {
+        useVehicleStore.setState({ vehicles: data });
+      });
+    }
+  }, [selectedDate, fetchTodayVehicles]);
 
   useEffect(() => {
     const filteredList = vehicles.filter((v) =>
@@ -50,6 +73,31 @@ const Vehicles = () => {
      
     console.log(res)
   }
+
+  const handleVisualTest = (bookingId) => {
+    // Navigate to visual test with booking ID
+    navigate(`/visualtest?bookingId=${bookingId}`);
+  };
+
+  const handleFunctionalTest = (bookingId) => {
+    // Navigate to functional test with booking ID
+    navigate(`/functionaltest?bookingId=${bookingId}`);
+  };
+
+  const handleStartTest = (bookingId) => {
+    // Navigate to tests page for pending vehicles
+    navigate(`/tests?bookingId=${bookingId}`);
+  };
+
+  const handleApproval = (bookingId) => {
+    // Navigate to approvals page for completed vehicles
+    navigate(`/approvals?bookingId=${bookingId}`);
+  };
+
+  const handleReport = (bookingId) => {
+    // Navigate to reports page for approved vehicles
+    navigate(`/reports?bookingId=${bookingId}`);
+  };
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 3;
@@ -67,6 +115,13 @@ const Vehicles = () => {
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3">
         <h2 className="text-2xl font-bold text-gray-900">Vehicle Management</h2>
         <div className="flex gap-3 w-full sm:w-auto">
+          {/* Date Picker */}
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="border border-gray-300 px-4 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
           <input
             type="text"
             placeholder="Search by Booking ID..."
@@ -119,16 +174,68 @@ const Vehicles = () => {
                   </span>
                 </td>
                 <td className="px-5 py-4">
-                  <div className="flex justify-center gap-2 text-gray-500">
-                    <FileText className="h-4 w-4 cursor-pointer hover:text-gray-700" />
-                    <Eye className="h-4 w-4 cursor-pointer hover:text-gray-700" />
-                    <Edit className="h-4 w-4 cursor-pointer hover:text-gray-700" />
-                    <button onClick={()=>handleClick(vehicle.bookingId)}>Start</button>
-                    {vehicle.status === "IN_PROGRESS" && (
-                      <Play className="h-4 w-4 text-blue-500 cursor-pointer hover:text-blue-700" />
+                  <div className="flex justify-center gap-2">
+                    {/* Actions based on vehicle status */}
+                    {vehicle.status === "PENDING" && (
+                      <button
+                        onClick={() => handleStartTest(vehicle.bookingId)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded transition-colors duration-200"
+                        title="Start Test"
+                      >
+                        Start Test
+                      </button>
                     )}
+                    
+                    {vehicle.status === "IN_PROGRESS" && (
+                      <>
+                        {/* Visual Test Button */}
+                        <button
+                          onClick={() => handleVisualTest(vehicle.bookingId)}
+                          className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded transition-colors duration-200"
+                          title="Visual Test"
+                        >
+                          Visual
+                        </button>
+                        
+                        {/* Functional Test Button */}
+                        <button
+                          onClick={() => handleFunctionalTest(vehicle.bookingId)}
+                          className="bg-green-500 hover:bg-green-600 text-white text-xs px-2 py-1 rounded transition-colors duration-200"
+                          title="Functional Test"
+                        >
+                          Functional
+                        </button>
+                      </>
+                    )}
+                    
+                    {vehicle.status === "COMPLETED" && (
+                      <button
+                        onClick={() => handleApproval(vehicle.bookingId)}
+                        className="bg-orange-500 hover:bg-orange-600 text-white text-xs px-3 py-1 rounded transition-colors duration-200"
+                        title="Go to Approval"
+                      >
+                        Approval
+                      </button>
+                    )}
+                    
+                    {vehicle.status === "APPROVED" && (
+                      <button
+                        onClick={() => handleReport(vehicle.bookingId)}
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1 rounded transition-colors duration-200"
+                        title="View Report"
+                      >
+                        Report
+                      </button>
+                    )}
+                    
                     {vehicle.status === "FAILED" && (
-                      <RotateCcw className="h-4 w-4 text-red-500 cursor-pointer hover:text-red-700" />
+                      <button
+                        onClick={() => handleStartTest(vehicle.bookingId)}
+                        className="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition-colors duration-200"
+                        title="Retry Test"
+                      >
+                        Retry
+                      </button>
                     )}
                   </div>
                 </td>
