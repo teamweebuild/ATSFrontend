@@ -52,6 +52,7 @@ const Vehicles = () => {
     }
   }, [selectedDate, fetchTodayVehicles]);
 
+
   useEffect(() => {
     const filteredList = vehicles.filter((v) =>
       v.bookingId.toLowerCase().includes(searchTerm.toLowerCase())
@@ -69,7 +70,7 @@ const Vehicles = () => {
   );
 
   const handleClick=async(bookingId)=>{
-     const res=await axiosInstance.post("/tests/start",{bookingId:bookingId})
+     const res=await axiosInstance.post("/tests/start",{regnNo:bookingId})
      
     console.log(res)
   }
@@ -178,7 +179,7 @@ const Vehicles = () => {
                     {/* Actions based on vehicle status */}
                     {vehicle.status === "PENDING" && (
                       <button
-                        onClick={() => handleStartTest(vehicle.bookingId)}
+                        onClick={() => {handleStartTest(vehicle.bookingId),handleClick(vehicle.regnNo)}}
                         className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded transition-colors duration-200"
                         title="Start Test"
                       >

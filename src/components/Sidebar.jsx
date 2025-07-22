@@ -29,6 +29,8 @@ const Sidebar = ({ isOpen, onClose }) => {
     { to: "/approvals", label: "Approvals", icon: <CheckCircle className="w-5 h-5" />, roles: ["ATS_ADMIN"] },
     { to: "/users", label: "Users", icon: <Users className="w-5 h-5" />, roles: ["ATS_ADMIN"] },
     { to: "/settings", label: "Settings", icon: <Settings className="w-5 h-5" />, roles: ["ATS_ADMIN"] },
+    {to:"/officerdashboard",label:"Dashboard",icon:<LayoutDashboard className="w-5 h-5" />, roles:["OFFICER"]},
+
   ];
 
   return (

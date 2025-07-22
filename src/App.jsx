@@ -14,6 +14,7 @@ import Settings from "./pages/Settings";
 import Layout from "./components/Layout";
 import VisualTestPage from "./pages/VisualTestPage";
 import FunctionalTestPage from "./pages/FunctionalTestPage";
+import OfficerDashboard from "./pages/OfficerDashboard";
 
 const App = () => {
  const { token, user, fetchUser } = useAuthStore();
@@ -33,6 +34,14 @@ const App = () => {
         {/* Protected routes */}
         {token ? (
           <Route element={<Layout />}>
+
+      {token && user?.role === "OFFICER" && (
+        <>
+          <Route path="/" element={<OfficerDashboard />} />
+          {/* <Route path="/details" element={<OfficerDetails />} /> */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </>
+      )}
             <Route path="/" element={<Dashboard />} />
             <Route path="/vehicles" element={<Vehicles />} />
             <Route path="/tests" element={<Tests />} />
@@ -47,8 +56,10 @@ const App = () => {
                 <Route path="/approvals" element={<Approvals />} />
                 <Route path="/users" element={<Users />} />
                 <Route path="/settings" element={<Settings />} />
+                {/* <Route path="/officerdashboard" element={<OfficerDashboard/>} /> */}
               </>
             )}
+
 
             {/* Catch-all */}
             <Route path="*" element={<Navigate to="/" />} />
@@ -57,6 +68,13 @@ const App = () => {
           // If not logged in, redirect everything to login
           <Route path="*" element={<Navigate to="/login" />} />
         )}
+        {
+          user && user.role==="OFFICER" &&(
+            <>
+           <Route path="/" element={<OfficerDashboard/>} />
+            </>
+          )
+        }
       </Routes>
 
   );

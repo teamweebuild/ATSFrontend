@@ -1,167 +1,4 @@
-// // // src/store/useVehicleStore.js
-// // import { create } from "zustand";
-// // import axios from "../services/axiosInstance";
-// // import { vehicleData } from "../assets/DummyData";
 
-// // export const useVehicleStore = create((set, get) => ({
-// //   vehicles: [],
-// //   loading: false,
-// //   error: null,
-// //   readyvehicles:[],
-// //   reportVehicles:[],
-// //   pendingVehiclesfortest:[],
-// //   vehicleTest:[],
-// //   getVehiclesReadyForApproval :async()=>{
-// //     set({ loading: true, error: null });
-// //     try{
-// //       const res=await axios.get('/nic/ready')
-// //       set({readyvehicles:res.data})
-// //     }
-// //     catch(err){
-// //       set({ error: err.message});
-// //     }
-// //   },
-// //   fetchTodayVehicles: async () => {
-// //     set({ loading: true, error: null });
-// //     try {
-// //       const res = await axios.get("/vehicles/today");
-// //       set({ vehicles: res.data, loading: false });
-// //     } catch (err) {
-// //       set({ error: err.message, loading: false });
-// //     }
-// //   },
-  
-// //   addVehicle: async (vehicleData) => {
-// //     try {
-// //       const res = await axios.post("/vehicles", vehicleData);
-// //       if (res?.data) {
-// //         // Optional: push it into the current list immediately
-// //         set((state) => ({
-// //           vehicles: [res.data, ...state.vehicles],
-// //         }));
-// //         return true;
-// //       }
-// //     } catch (err) {
-// //       console.error("Error adding vehicle:", err.response?.data || err.message);
-// //       throw err;
-// //     }
-// //   },
-// //   submittedVehicles:async()=>{
-// //     try{
-// //       const res=await axios.get("/nic/logs/allvehicles");
-// //       set({reportVehicles:res.data})
-
-// //     }
-// //     catch(e){
-// //     console.log(e)
-// //     }
-// //   },
-// //   pendingVehicles: async () => {
-// //     const vehicles = get().vehicles;
-// //     const filtered = vehicles.filter(v => v.status === "PENDING");
-// //     set({ pendingVehiclesfortest: filtered });
-// //   },
-
-// //   filteredVehicles:async(VehicleData)=>{
-// //     set({vehicleTest:VehicleData})
-// //   }
-
-// // }));
-// // src/store/useVehicleStore.js
-// import { create } from "zustand";
-// import axios from "../services/axiosInstance";
-
-// export const useVehicleStore = create((set, get) => ({
-//   vehicles: [],
-//   readyvehicles: [],
-//   reportVehicles: [],
-//   pendingVehiclesfortest: [],
-//   vehicleTest: null,  // ✅ single test instance
-
-//   loading: false,
-//   error: null,
-// filteredVehi:null,
-//   // ✅ Get vehicles ready for approval
-//   getVehiclesReadyForApproval: async () => {
-//     set({ loading: true, error: null });
-//     try {
-//       const res = await axios.get("/nic/ready");
-//       set({ readyvehicles: res.data, loading: false });
-//     } catch (err) {
-//       set({ error: err.message, loading: false });
-//     }
-//   },
-
-//   // ✅ Fetch all today's vehicles
-//   fetchTodayVehicles: async () => {
-//     set({ loading: true, error: null });
-//     try {
-//       const res = await axios.get("/vehicles/today");
-//       set({ vehicles: res.data, loading: false });
-//     } catch (err) {
-//       set({ error: err.message, loading: false });
-//     }
-//   },
-
-//   // ✅ Add new vehicle
-//   addVehicle: async (vehicleData) => {
-//     try {
-//       const res = await axios.post("/vehicles", vehicleData);
-//       if (res?.data) {
-//         set((state) => ({
-//           vehicles: [res.data, ...state.vehicles],
-//         }));
-//         return true;
-//       }
-//     } catch (err) {
-//       console.error("Error adding vehicle:", err.response?.data || err.message);
-//       throw err;
-//     }
-//   },
-
-//   // ✅ Fetch submitted vehicles
-//   submittedVehicles: async () => {
-//     try {
-//       const res = await axios.get("/nic/logs/allvehicles");
-//       set({ reportVehicles: res.data });
-//     } catch (e) {
-//       console.error(e);
-//     }
-//   },
-
-//   // ✅ Filter pending vehicles for test
-//   pendingVehicles: () => {
-//     const vehicles = get().vehicles;
-//     const filtered = vehicles.filter((v) => v.status === "PENDING");
-//     set({ pendingVehiclesfortest: filtered });
-//   },
-
-//   // ✅ Set single vehicle test instance
-//   setVehicleTest: (vehicleData) => {
-//     set({ vehicleTest: vehicleData });
-//   },
- 
-//   fetchTests: async (bookingId) => {
-//     const res = await axios.get(`/tests/getTest/${bookingId}`);
-//     set({ vehicleTest: res.data });
-//     return res.data;
-//   },
-  
- 
-//   filteredFetch: async (vehicleData) => {
-//     const tests = vehicleData || {};
-//     const filteredTests = Object.entries(tests)
-//       .filter(([_, v]) => v?.status !== "completed")
-//       .map(([code, v]) => ({
-//         code,
-//         ...v,
-//       }));
-//     set({ filteredVehi: filteredTests });
-//   },
-  
-  
-
-// }));
 import { create } from "zustand";
 import axios from "../services/axiosInstance";
 import axiosInstance from "../services/axiosInstance";
@@ -177,6 +14,7 @@ export const useVehicleStore = create((set, get) => ({
   error: null,
   searchbar:"",
   currentVehicle:[],
+  totalVehicle:[],
   getVehiclesReadyForApproval: async () => {
     set({ loading: true, error: null });
     try {
@@ -185,6 +23,16 @@ export const useVehicleStore = create((set, get) => ({
     } catch (err) {
       set({ error: err.message, loading: false });
     }
+  },
+  getTotalVehicles:async ()=>{
+      try{
+        const res=await axios.get("/vehicles/allvehicles");
+        set({totalVehicle:res.data});
+      }
+      catch(err){  
+        console.error("Error fetching total vehicles:", err.message);
+        set({ error: err.message });
+      }
   },
 
   fetchTodayVehicles: async () => {
@@ -199,7 +47,7 @@ export const useVehicleStore = create((set, get) => ({
 
   addVehicle: async (vehicleData) => {
     try {
-      const res = await axios.post("/vehicles", vehicleData);
+      const res = await axios.post("/vehicles/", vehicleData);
       if (res?.data) {
         set((state) => ({
           vehicles: [res.data, ...state.vehicles],

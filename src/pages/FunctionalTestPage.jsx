@@ -4,7 +4,7 @@ import VehicleSelection from "../components/VehicleSelection";
 import VehicleDetails from "../components/VehicleDetails";
 import FunctionalTestForm from "../components/FunctionalTestForm";
 import AlertMessage from "../components/AlertMessage";
-import { Zap } from "lucide-react";
+import { Zap, Gauge } from "lucide-react";
 
 const FunctionalTestPage = () => {
   const {
@@ -38,6 +38,13 @@ const FunctionalTestPage = () => {
       description: 'Measure vehicle acceleration performance according to Rule 189.37',
       icon: Zap,
       color: 'blue'
+    },
+    {
+      id: 'rule189_4',
+      name: 'Rule 189.4 - Speedometer Test',
+      description: 'Measure speedometer accuracy performance according to Rule 189.4',
+      icon: Gauge,
+      color: 'green'
     }
   ];
 
@@ -228,7 +235,7 @@ const FunctionalTestPage = () => {
                     Select Vehicle for {getSelectedTestName()}
                   </h3>
                   <p className="text-sm text-gray-500 mt-1">
-                    Choose a vehicle to perform the acceleration test
+                    Choose a vehicle to perform the functional test
                   </p>
                 </div>
                 <button

@@ -17,11 +17,13 @@ const Dashboard = () => {
   const vehicles = useVehicleStore((state) => state.vehicles || []);
   const submittedVehiclesFn=useVehicleStore((state)=>state.submittedVehicles);
   const submittedVehicles=useVehicleStore((state)=>state.reportVehicles);
-  
+  const pendingVehicleFN=useVehicleStore(s=>s.pendingVehicles);
+const pendingvehicle=useVehicleStore(s=>s.pendingVehiclesForTest)
   useEffect(()=>{
     submittedVehiclesFn();
     totalvehicles();
- },[submittedVehiclesFn,totalvehicles])
+    pendingVehicleFN();
+ },[submittedVehiclesFn,totalvehicles,pendingVehicleFN])
 
 
   const getCount = (arr) => arr?.length || 0;
@@ -54,7 +56,7 @@ const Dashboard = () => {
         />
         <MetricCard
           title="Pending Tests"
-          value={getCount(vehicles)-getCount(submittedVehicles)}
+          value={getCount(pendingvehicle)}
           icon={clock}
           color="yellow"
         />

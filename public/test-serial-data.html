@@ -110,6 +110,33 @@
         .acceleration-highlight .field-name {
             color: #15803d !important;
         }
+        .speedometer-highlight {
+            border-left-color: #3b82f6 !important;
+            background: #eff6ff !important;
+        }
+        .speedometer-highlight .field-name {
+            color: #1d4ed8 !important;
+        }
+        .test-section {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .test-section.active {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .single-btn {
+            background: #f59e0b;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -117,14 +144,36 @@
         <h1>🔧 Serial Data Simulator Test Page</h1>
         <p>This page tests the serial data simulation for the functional test system.</p>
         
-        <div class="controls">
-            <button class="start-btn" onclick="startTest()">▶️ Start Simulation</button>
-            <button class="stop-btn" onclick="stopTest()">⏹️ Stop Simulation</button>
-            <button class="clear-btn" onclick="clearDisplay()">🗑️ Clear Display</button>
+        <!-- Acceleration Test Controls -->
+        <div class="test-section" id="accelerationSection">
+            <h3>🚀 Acceleration Test Simulation</h3>
+            <div class="controls">
+                <button class="start-btn" onclick="startAccelerationTest()">▶️ Start Acceleration</button>
+                <button class="stop-btn" onclick="stopAccelerationTest()">⏹️ Stop Acceleration</button>
+                <button class="single-btn" onclick="sendSingleAcceleration()">📤 Send Single Reading</button>
+            </div>
+            <div id="accelerationStatus" class="status stopped">
+                ⏸️ Acceleration Simulation Stopped
+            </div>
         </div>
-        
-        <div id="status" class="status stopped">
-            ⏸️ Simulation Stopped
+
+        <!-- Speedometer Test Controls -->
+        <div class="test-section" id="speedometerSection">
+            <h3>🚗 Speedometer Test Simulation</h3>
+            <div class="controls">
+                <button class="start-btn" onclick="startSpeedometerTest()">▶️ Start Speedometer</button>
+                <button class="stop-btn" onclick="stopSpeedometerTest()">⏹️ Stop Speedometer</button>
+                <button class="single-btn" onclick="sendSingleSpeedometer()">📤 Send Single Reading</button>
+            </div>
+            <div id="speedometerStatus" class="status stopped">
+                ⏸️ Speedometer Simulation Stopped
+            </div>
+        </div>
+
+        <!-- General Controls -->
+        <div class="controls">
+            <button class="clear-btn" onclick="clearDisplay()">🗑️ Clear Display</button>
+            <button class="stop-btn" onclick="stopAllTests()">⏹️ Stop All</button>
         </div>
         
         <div class="container">
@@ -144,10 +193,19 @@
         <div class="container">
             <h3>📋 Statistics</h3>
             <div id="stats">
-                <p>Total readings: <span id="totalReadings">0</span></p>
-                <p>Simulation time: <span id="simulationTime">0</span> seconds</p>
-                <p>Last acceleration reading: <span id="lastAcceleration">N/A</span></p>
-                <p>Average acceleration: <span id="avgAcceleration">N/A</span></p>
+                <p><strong>Acceleration Test:</strong></p>
+                <p>└ Total readings: <span id="totalAccelerationReadings">0</span></p>
+                <p>└ Last reading: <span id="lastAcceleration">N/A</span></p>
+                <p>└ Average: <span id="avgAcceleration">N/A</span></p>
+                <br>
+                <p><strong>Speedometer Test:</strong></p>
+                <p>└ Total readings: <span id="totalSpeedometerReadings">0</span></p>
+                <p>└ Last accuracy: <span id="lastSpeedAccuracy">N/A</span></p>
+                <p>└ Average accuracy: <span id="avgSpeedAccuracy">N/A</span></p>
+                <br>
+                <p><strong>General:</strong></p>
+                <p>└ Total readings: <span id="totalReadings">0</span></p>
+                <p>└ Simulation time: <span id="simulationTime">0</span> seconds</p>
             </div>
         </div>
     </div>
@@ -155,8 +213,11 @@
     <script>
         let dataLog = [];
         let accelerationReadings = [];
+        let speedometerReadings = [];
         let simulationStartTime = null;
         let statsInterval = null;
+        let accelerationRunning = false;
+        let speedometerRunning = false;
 
         // Override the serial data handler
         window.onSerialData = function(data) {
@@ -170,19 +231,26 @@
             dataLog.unshift({
                 timestamp: timestamp,
                 raw: data,
-                parsed: parsedData
+                parsed: parsedData,
+                testType: parsedData.test_type
             });
             
-            // Keep only last 10 readings
-            if (dataLog.length > 10) {
-                dataLog = dataLog.slice(0, 10);
+            // Keep only last 20 readings
+            if (dataLog.length > 20) {
+                dataLog = dataLog.slice(0, 20);
             }
             
-            // Track acceleration readings for stats
-            if (parsedData.acceleration_time) {
+            // Track readings by type for stats
+            if (parsedData.test_type === 'acceleration' && parsedData.acceleration_time) {
                 accelerationReadings.push(parseFloat(parsedData.acceleration_time));
                 if (accelerationReadings.length > 50) {
                     accelerationReadings = accelerationReadings.slice(-50);
+                }
+            } else if (parsedData.test_type === 'speedometer_hd' && parsedData.Speed_Accuracy) {
+                const accuracy = parseFloat(parsedData.Speed_Accuracy.replace(/[^\d.-]/g, '') || 0);
+                speedometerReadings.push(accuracy);
+                if (speedometerReadings.length > 50) {
+                    speedometerReadings = speedometerReadings.slice(-50);
                 }
             }
             
@@ -220,16 +288,23 @@
             const latest = dataLog[0];
             const parsedHtml = Object.entries(latest.parsed).map(([key, value]) => {
                 const isAcceleration = key === 'acceleration_time';
+                const isSpeedAccuracy = key === 'Speed_Accuracy';
+                const isTestType = key === 'test_type';
+                
+                let className = 'data-field';
+                if (isAcceleration) className += ' acceleration-highlight';
+                if (isSpeedAccuracy) className += ' speedometer-highlight';
+                
                 return `
-                    <div class="data-field ${isAcceleration ? 'acceleration-highlight' : ''}">
+                    <div class="${className}">
                         <div class="field-name">${key.replace(/_/g, ' ').toUpperCase()}</div>
-                        <div class="field-value">${value}${isAcceleration ? ' seconds' : ''}</div>
+                        <div class="field-value">${value}${isAcceleration ? ' seconds' : isSpeedAccuracy ? '' : ''}</div>
                     </div>
                 `;
             }).join('');
             
             currentDataDiv.innerHTML = `
-                <div class="timestamp">Last updated: ${latest.timestamp.toLocaleTimeString()}</div>
+                <div class="timestamp">Last updated: ${latest.timestamp.toLocaleTimeString()} | Test Type: ${latest.testType || 'Unknown'}</div>
                 <div class="parsed-data">${parsedHtml}</div>
             `;
         }
@@ -255,10 +330,9 @@
         function updateStats() {
             document.getElementById('totalReadings').textContent = dataLog.length;
             
-            if (simulationStartTime) {
-                const elapsed = Math.floor((Date.now() - simulationStartTime) / 1000);
-                document.getElementById('simulationTime').textContent = elapsed;
-            }
+            // Acceleration stats
+            const accelerationCount = dataLog.filter(item => item.testType === 'acceleration').length;
+            document.getElementById('totalAccelerationReadings').textContent = accelerationCount;
             
             if (accelerationReadings.length > 0) {
                 const latest = accelerationReadings[accelerationReadings.length - 1];
@@ -267,43 +341,126 @@
                 document.getElementById('lastAcceleration').textContent = latest.toFixed(2) + ' seconds';
                 document.getElementById('avgAcceleration').textContent = average + ' seconds';
             }
+            
+            // Speedometer stats
+            const speedometerCount = dataLog.filter(item => item.testType === 'speedometer_hd').length;
+            document.getElementById('totalSpeedometerReadings').textContent = speedometerCount;
+            
+            if (speedometerReadings.length > 0) {
+                const latest = speedometerReadings[speedometerReadings.length - 1];
+                const average = (speedometerReadings.reduce((a, b) => a + b, 0) / speedometerReadings.length).toFixed(2);
+                
+                document.getElementById('lastSpeedAccuracy').textContent = latest.toFixed(2) + ' km/h';
+                document.getElementById('avgSpeedAccuracy').textContent = average + ' km/h';
+            }
+            
+            if (simulationStartTime) {
+                const elapsed = Math.floor((Date.now() - simulationStartTime) / 1000);
+                document.getElementById('simulationTime').textContent = elapsed;
+            }
         }
 
-        function startTest() {
-            if (window.startSerialSimulation) {
-                window.startSerialSimulation();
-                document.getElementById('status').className = 'status running';
-                document.getElementById('status').innerHTML = '▶️ Simulation Running';
-                simulationStartTime = Date.now();
+        // Acceleration test functions
+        function startAccelerationTest() {
+            if (window.startAccelerationSimulation) {
+                window.startAccelerationSimulation();
+                accelerationRunning = true;
+                document.getElementById('accelerationStatus').className = 'status running';
+                document.getElementById('accelerationStatus').innerHTML = '▶️ Acceleration Simulation Running';
+                document.getElementById('accelerationSection').classList.add('active');
                 
-                // Update stats every second
-                statsInterval = setInterval(updateStats, 1000);
+                if (!simulationStartTime) {
+                    simulationStartTime = Date.now();
+                    statsInterval = setInterval(updateStats, 1000);
+                }
             } else {
                 alert('Serial simulator not loaded. Please refresh the page.');
             }
         }
 
-        function stopTest() {
-            if (window.stopSerialSimulation) {
-                window.stopSerialSimulation();
-                document.getElementById('status').className = 'status stopped';
-                document.getElementById('status').innerHTML = '⏸️ Simulation Stopped';
+        function stopAccelerationTest() {
+            if (window.stopAccelerationSimulation) {
+                window.stopAccelerationSimulation();
+                accelerationRunning = false;
+                document.getElementById('accelerationStatus').className = 'status stopped';
+                document.getElementById('accelerationStatus').innerHTML = '⏸️ Acceleration Simulation Stopped';
+                document.getElementById('accelerationSection').classList.remove('active');
                 
-                if (statsInterval) {
+                if (!speedometerRunning && statsInterval) {
                     clearInterval(statsInterval);
                     statsInterval = null;
                 }
             }
         }
 
+        function sendSingleAcceleration() {
+            if (window.sendSingleAccelerationData) {
+                window.sendSingleAccelerationData();
+            } else {
+                alert('Serial simulator not loaded. Please refresh the page.');
+            }
+        }
+
+        // Speedometer test functions
+        function startSpeedometerTest() {
+            if (window.startSpeedometerSimulation) {
+                window.startSpeedometerSimulation();
+                speedometerRunning = true;
+                document.getElementById('speedometerStatus').className = 'status running';
+                document.getElementById('speedometerStatus').innerHTML = '▶️ Speedometer Simulation Running';
+                document.getElementById('speedometerSection').classList.add('active');
+                
+                if (!simulationStartTime) {
+                    simulationStartTime = Date.now();
+                    statsInterval = setInterval(updateStats, 1000);
+                }
+            } else {
+                alert('Serial simulator not loaded. Please refresh the page.');
+            }
+        }
+
+        function stopSpeedometerTest() {
+            if (window.stopSpeedometerSimulation) {
+                window.stopSpeedometerSimulation();
+                speedometerRunning = false;
+                document.getElementById('speedometerStatus').className = 'status stopped';
+                document.getElementById('speedometerStatus').innerHTML = '⏸️ Speedometer Simulation Stopped';
+                document.getElementById('speedometerSection').classList.remove('active');
+                
+                if (!accelerationRunning && statsInterval) {
+                    clearInterval(statsInterval);
+                    statsInterval = null;
+                }
+            }
+        }
+
+        function sendSingleSpeedometer() {
+            if (window.sendSingleSpeedometerData) {
+                window.sendSingleSpeedometerData();
+            } else {
+                alert('Serial simulator not loaded. Please refresh the page.');
+            }
+        }
+
+        // General functions
+        function stopAllTests() {
+            stopAccelerationTest();
+            stopSpeedometerTest();
+        }
+
         function clearDisplay() {
             dataLog = [];
             accelerationReadings = [];
+            speedometerReadings = [];
             simulationStartTime = null;
             document.getElementById('totalReadings').textContent = '0';
+            document.getElementById('totalAccelerationReadings').textContent = '0';
+            document.getElementById('totalSpeedometerReadings').textContent = '0';
             document.getElementById('simulationTime').textContent = '0';
             document.getElementById('lastAcceleration').textContent = 'N/A';
             document.getElementById('avgAcceleration').textContent = 'N/A';
+            document.getElementById('lastSpeedAccuracy').textContent = 'N/A';
+            document.getElementById('avgSpeedAccuracy').textContent = 'N/A';
             updateDisplay();
         }
 
@@ -312,13 +469,10 @@
         script.src = 'serial-data-simulator.js';
         document.head.appendChild(script);
         
-        // Auto-start after script loads
+        // Auto-start disabled - manual control only
         script.onload = function() {
             console.log('✅ Serial simulator loaded');
-            setTimeout(() => {
-                console.log('🔄 Auto-starting simulation...');
-                startTest();
-            }, 1000);
+            console.log('🎮 Use the buttons above to control different test simulations');
         };
     </script>
 </body>
