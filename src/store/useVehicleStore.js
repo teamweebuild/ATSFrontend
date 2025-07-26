@@ -77,12 +77,6 @@ export const useVehicleStore = create((set, get) => ({
     }
   },
 
-  pendingVehicles: () => {
-    const vehicles = get().vehicles || [];
-    const filtered = vehicles.filter((v) => v.status === "PENDING");
-    set({ pendingVehiclesForTest: filtered });
-  },
-
   fetchTests: async (bookingId) => {
     try {
       const res = await axios.get(`/tests/getTest/${bookingId}`);

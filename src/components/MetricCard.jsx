@@ -1,6 +1,6 @@
 import React from 'react'
 
-const MetricCard = ({ title, value, icon: Icon, color = 'blue' }) => {
+const MetricCard = ({ title, value, icon, color = 'blue' }) => {
   const colorClasses = {
     blue: 'bg-blue-100 text-blue-600',
     green: 'bg-green-100 text-green-600',
@@ -11,7 +11,11 @@ const MetricCard = ({ title, value, icon: Icon, color = 'blue' }) => {
   return (
     <div className="p-4 bg-white rounded-xl shadow flex items-center space-x-4">
       <div className={`p-3 rounded-full ${colorClasses[color]} flex items-center justify-center`}>
-        <img src={Icon} alt="" className="h-6 w-6" />
+        {
+          typeof icon === 'string'
+            ? <img src={icon} alt="" className="h-6 w-6" />
+            : icon // If JSX component (like <Clock1 />), render directly
+        }
       </div>
       <div>
         <h3 className="text-xl font-semibold text-gray-800">{title}</h3>

@@ -14,7 +14,7 @@ import Settings from "./pages/Settings";
 import Layout from "./components/Layout";
 import VisualTestPage from "./pages/VisualTestPage";
 import FunctionalTestPage from "./pages/FunctionalTestPage";
-import OfficerDashboard from "./pages/OfficerDashboard";
+
 
 const App = () => {
  const { token, user, fetchUser } = useAuthStore();
@@ -61,13 +61,7 @@ const App = () => {
           // If not logged in, redirect everything to login
           <Route path="*" element={<Navigate to="/login" />} />
         )}
-        {
-          user && user.role==="OFFICER" &&(
-            <>
-           <Route path="/" element={<OfficerDashboard/>} />
-            </>
-          )
-        }
+      
       </Routes>
 
   );

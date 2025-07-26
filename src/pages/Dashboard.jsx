@@ -7,7 +7,7 @@ import MetricCard from "../components/MetricCard";
 import done from "../assets/Vector-4.svg";
 import car from "../assets/car.svg";
 import clock from "../assets/Group.svg";
-
+import { Clock1 } from "lucide-react";
 const Dashboard = () => {
   const { user } = useAuthStore();
 
@@ -15,15 +15,16 @@ const Dashboard = () => {
 
   const totalvehicles=useVehicleStore(state=>state.fetchTodayVehicles)
   const vehicles = useVehicleStore((state) => state.vehicles || []);
-  const submittedVehiclesFn=useVehicleStore((state)=>state.submittedVehicles);
-  const submittedVehicles=useVehicleStore((state)=>state.reportVehicles);
-  const pendingVehicleFN=useVehicleStore(s=>s.pendingVehicles);
-const pendingvehicle=useVehicleStore(s=>s.pendingVehiclesForTest)
+  const pendingVehicles = vehicles.filter((v) => v.status === 'PENDING');
+  const INPROGRESSvehicles = vehicles.filter((v) => v.status === 'IN_PROGRESS');
+  const CompletedVehicles = vehicles.filter((v) => v.status === 'COMPLETED');
+  const APPROVEDVEHICLES = vehicles.filter((v) => v.status === 'APPROVED');
+  const SENT_TO_NIC=vehicles.filter(v=>v.status==="SENT_TO_NIC")
   useEffect(()=>{
-    submittedVehiclesFn();
+
     totalvehicles();
-    pendingVehicleFN();
- },[submittedVehiclesFn,totalvehicles,pendingVehicleFN])
+
+ },[totalvehicles])
 
 
   const getCount = (arr) => arr?.length || 0;
@@ -48,18 +49,38 @@ const pendingvehicle=useVehicleStore(s=>s.pendingVehiclesForTest)
           icon={car}
           color="blue"
         />
+         <MetricCard
+          title="Tests Approved"
+          value={getCount(APPROVEDVEHICLES)}
+          icon={done}
+          color="green"
+        />
         <MetricCard
           title="Tests Completed"
-          value={getCount(submittedVehicles)}
+          value={getCount(CompletedVehicles)}
           icon={done}
           color="green"
         />
         <MetricCard
           title="Pending Tests"
-          value={getCount(pendingvehicle)}
+          value={getCount(pendingVehicles)}
           icon={clock}
           color="yellow"
         />
+         <MetricCard
+          title="Tests InProgress"
+          value={getCount(INPROGRESSvehicles)}
+          icon={clock}
+          color="yellow"
+        />
+          <MetricCard
+          title="Tests Results awaited"
+          value={getCount(SENT_TO_NIC)}
+          icon={<Clock1/>}
+          color="green"
+        />
+         
+        
       </div>
     </div>
   );
