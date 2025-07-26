@@ -231,7 +231,7 @@ const Vehicles = () => {
                     
                     {vehicle.status === "FAILED" && (
                       <button
-                        onClick={() => handleStartTest(vehicle.bookingId)}
+                        onClick={() => handleStartTest(vehicle.regnNo)}
                         className="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition-colors duration-200"
                         title="Retry Test"
                       >

@@ -15,10 +15,14 @@ export const useVehicleStore = create((set, get) => ({
   searchbar:"",
   currentVehicle:[],
   totalVehicle:[],
+  pendingVehiclesAll: [],
+  completedVehicles: [],
+  approvedVehicles: [],
   getVehiclesReadyForApproval: async () => {
     set({ loading: true, error: null });
     try {
       const res = await axios.get("/nic/ready");
+
       set({ readyVehicles: res.data, loading: false });
     } catch (err) {
       set({ error: err.message, loading: false });
@@ -27,7 +31,10 @@ export const useVehicleStore = create((set, get) => ({
   getTotalVehicles:async ()=>{
       try{
         const res=await axios.get("/vehicles/allvehicles");
-        set({totalVehicle:res.data});
+        const filtered = res.data.filter((v) => v.status === "PENDING"|| v.status === "IN_PROGRESS");
+        const completed=res.data.filter((v) => v.status === "COMPLETED");
+        const approved=res.data.filter((v) => v.status === "APPROVED");
+        set({totalVehicle:res.data, pendingVehiclesAll: filtered , completedVehicles:completed, approvedVehicles:approved});
       }
       catch(err){  
         console.error("Error fetching total vehicles:", err.message);
@@ -38,7 +45,8 @@ export const useVehicleStore = create((set, get) => ({
   fetchTodayVehicles: async () => {
     set({ loading: true, error: null });
     try {
-      const res = await axios.get("/vehicles/today");
+      const res = await axios.get("/vehicles/all");
+      console.log(res.data);
       set({ vehicles: res.data, loading: false });
     } catch (err) {
       set({ error: err.message, loading: false });

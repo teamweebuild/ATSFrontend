@@ -35,13 +35,6 @@ const App = () => {
         {token ? (
           <Route element={<Layout />}>
 
-      {token && user?.role === "OFFICER" && (
-        <>
-          <Route path="/" element={<OfficerDashboard />} />
-          {/* <Route path="/details" element={<OfficerDetails />} /> */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </>
-      )}
             <Route path="/" element={<Dashboard />} />
             <Route path="/vehicles" element={<Vehicles />} />
             <Route path="/tests" element={<Tests />} />

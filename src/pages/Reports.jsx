@@ -8,7 +8,7 @@ const Reports = () => {
   useEffect(() => {
     fetchSubmittedVehicles();
   }, [fetchSubmittedVehicles]);
-
+console.log(submittedVehicles)
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -34,7 +34,7 @@ const Reports = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{v.vehicle?.regnNo || '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{v.updatedAt?.slice(0,10)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{v.vehicle?.engineNo || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{v?.certificateStatus || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{v?.vehicle?.status || '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                         Download Report
